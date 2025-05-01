@@ -1,0 +1,7 @@
+How many applications have a loan amount greater than the applicant income?
+What is the average income of applications for owner-occupied properties?
+What is the most common primary loan denial reason?
+What are the different loan purpose names?
+List applications with an applicant income greater than 200 thousand. 
+What is the average loan amount for conventional loans?
+Show the applicant ethnicity name for application ID 1.

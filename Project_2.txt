@@ -1,0 +1,83 @@
+For this project you will make a program that accesses the database using natural language using a local llm. It is worth 40 pts just like the last project.
+
+This program will have several parts. Much of the programming work will be debugging, you are encoraged to use real LLMs for debugging.
+
+If you are unsure of any part of this project, you should as an LLM to explain it to you. AI use is permitted for this project. The good ones right now are Claude 3.7, gemini 2.5 flash/pro, and open AI O3-mini, O4mini or O1. You should have free access to gemeni through your rutgers email address and the others through varios free trials. YOU MUST INCLUDE ALL TRANSCRIPTS OF ALL CHATS.
+
+For all parts: You may need to install new packages using pip or pip3.
+
+ON ILAB:
+1.A stub python program which takes in as an argument a SELECT SQL query, and prints out the results on the database. (Note pandas may be helpful for table formatting). 1 pt extra credit: Make this program work by reading from stdin when no argument is passed, you will need to adjust the ssh tunnel to pass via stdin as well.
+
+LOCALLY:
+1. Make a file which is a subset of the previos SQL script including only the create table statemnts and a few insert ones.
+2. Get an llm running. I recomend https://huggingface.co/bartowski/Phi-3.5-mini-instruct-GGUF/blob/main/Phi-3.5-mini-instruct-Q4_K_M.gguf (this is a direct link to a 2GB download). You will need to install packages to make it work, I recommend llamma_cpp_python.
+3. Do very basic text proccessing to make a prompt it will include instrucitons (e.g. write and SQL query) the entire file that you wrote, and the user's question.
+	-Instructions may be along the lines of "Write and SQL query in response to the following schema and question" But you will need to experiment to see what works best.
+	-The better your prompt the less text processing you will need to do, be sure to ask the other llms what good prompts might be.
+4. Write logic to have a loop where you take questions from the user and feed them into the llm. The loop should end and close the program if the user types in the exact string "exit"
+5. Process the response to extract only the SQL query. (iterativly adjust your text processing and your prompt to find something that works)
+6. Use an SSH tunnel to call the script you wrote on ilab with the output of the llm. (I recommend paramiko) YOU MUST NOT TAKE IN PASSWORDS IN A VISIBLE WAY. You should prompt the user using getpass library.
+7. Put all of this together to make an interactive program that displays the results of the query to the user.
+
+
+|SSH credentials (username, then password)|->[SSH TUNNEL]
+
+|User question| + [scema from project 1] + [prompt  language]->[LLM]->[Some Text]->[5. String processer]->|SQL SELECT QUERY FROM INSIDE THAT TEXT|
+
+
+|SQL SELECT QUERY FROM INSIDE THAT TEXT|->[SSH TUNNEL]->[stub python program on ILAB]->[Postgres.cs.rutgers.edu postgres instance]->|Table|
+
+|Table| -> [SSH TUNNEL] -> Print out answer
+
+Academic Dishonesty
+------------------
+
+Code coppied from anywhere will be dealt with according to the Rutgers Academic Dishonesty policy.
+If the copied code's source is referenced, the maximum penalty will be 75% off the given assingment, 
+and likely nothing depending on how much was copied and whether you had the license.
+
+It is OK to take code from official language documentation, but you should still cite it.
+
+If the code is not cited, and makes up a substantial portion of the project, the MINIMUM penalty will be
+a zero on the assignment.
+
+
+
+RUBRIC:
+
+We will test on 5 queries, it must work for 3 of them. I will make sure all 5 work on my machine.
+
+
+14 pts: Your ilab program works correctly, taking in a SELECT query as the first argument and printing a well formatted table that can be read.
+10 pts: You have a running LLM that can take in instructions and return some text(steps 2-3)
+8 pts: You have working non-llm logic that takes the llm response and turns it into a single SELECT query string(Step 1,5) And you have a query file including the neccecary create table scripts (IF YOU DIDN"T DO THE PREVIOS STEP, YOU CAN SHOW THAT THIS WORKS BY MANUALLY FEEDING IN AN LLM RESPONSE FROM ONLINE MODELS)
+8 pts: You got the SSH tunnel working and assembled all previos steps into a coherent program that accomplishes the task. (Step 4,6-7)
+1pt: You did the extra credit and it works perfectly (adjusted both sides to pass from std_in instead of arguments), no partial credit for this part.
+
+ADDITIONAL DEMERIT:
+-3 points no readme.
+-5 points Do not include full LLM transcripts.
+-? other missing parts not covered by previos sections.
+
+TO TURN IN:
+1. The working scripts called database_llm.py to run locally and ilab_script.py to run on ilab machine.
+1a. The 2 SQL scripts to create the database and the one to feed into the LLM
+2. A video of your project working (or a link to an uploaded one). It should show success on at least 3 different queries.
+3. A readme:
+	Naming all team members
+	their contributions
+	What you found challenging
+	What you found interesting
+	Did you do the extra credit
+4. transcripts of all chats you used to complete this project.
+
+HINTS:
+A good testing query is "How many mortgages have a loan value greater than the applicant income?"
+And "What is the average income of owner occupied applications?" and "What is the most common loan denial reason?"
+
+My context window is 2048 larger context will let you pass more of your schema at the expense of slower llm.
+
+my max_tokens is 200. This is the maximum number of words the llm will generate
+
+if you end your propt with the sql flag it will be a lot more likly to imediatly give an SQL query.

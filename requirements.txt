@@ -1,0 +1,4 @@
+paramiko
+llama-cpp-python
+pandas
+psycopg2-binary

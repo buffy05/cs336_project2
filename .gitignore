@@ -1,0 +1,21 @@
+# Large Files (already added)
+Phi-3.5-mini-instruct-Q4_K_M.gguf
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS generated files
+.DS_Store
+
+# IDE / Editor directories
+.vscode/
+.idea/
