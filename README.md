@@ -30,6 +30,7 @@
 ## Interesting Findings
 
 ## Extra Credit
+Yes we have implemented the extra credit requirement 
 
 
 ## LLM Chat Transcripts
