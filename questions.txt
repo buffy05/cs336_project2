@@ -1,7 +1,45 @@
-How many applications have a loan amount greater than the applicant income?
-What is the average income of applications for owner-occupied properties?
-What is the most common primary loan denial reason?
-What are the different loan purpose names?
-List applications with an applicant income greater than 200 thousand. 
-What is the average loan amount for conventional loans?
-Show the applicant ethnicity name for application ID 1.
+# Test Questions for Project 2 (HMDA 2017 NJ Database)
+# --- Basic Counts & Aggregations ---
+1.  How many records are in the Application table?
+2.  What is the average value of loan_amount_000s?
+3.  What is the average value of applicant_income_000s?
+4.  Count applications with action_taken code 1.
+5.  How many applications have applicant_income_000s greater than 150?
+6.  What is the maximum loan_amount_000s recorded?
+7.  Calculate the sum of loan_amount_000s for all applications.
+
+# --- Loan & Property Characteristics (Using Codes) ---
+8.  What is the average loan_amount_000s for applications with loan_type code 1?
+9.  How many applications have property_type code 3?
+10. Count applications with loan_purpose code 1.
+11. What percentage of applications have owner_occupancy code 1?
+12. How many distinct loan_type codes are present in the Application table?
+
+# --- Applicant Demographics (Using Codes) ---
+13. How many applications have applicant_ethnicity code 1?
+14. What is the average applicant_income_000s for applications linked to applicant race code 2? (Requires join Application -> ApplicantRace)
+15. Count applications where applicant_sex code is 2.
+16. How many applications have a non-null co_applicant_sex code?
+17. How many distinct applicant_sex codes are recorded for applications with applicant_income_000s below 50?
+
+# --- Application Outcomes & Denials (Using Codes) ---
+18. How many applications have denial_reason_1 code 3?
+19. What is the most frequent denial_reason_1 code? Show the code and its count.
+20. Count the number of applications where action_taken code is 3.
+21. What is the average loan_amount_000s for applications where action_taken code is 2?
+22. How many applications have preapproval code 1?
+
+# --- Geographic/Location Based (Numerical Joins) ---
+23. How many distinct county_code values are associated with applications? (Requires join Application -> Location)
+24. What is the average applicant_income_000s for applications linked to county_code 1? (Requires join Application -> Location)
+25. Count applications linked to msamd 35620. (Requires join Application -> Location)
+
+# --- More Complex Numerical Queries / Joins (Focus on Aggregates/Counts) ---
+26. What is the agency_code for the application with the highest loan_amount_000s? (Should return single value)
+27. How many applications have denial_reason_1 code 1 and applicant_income_000s greater than 200?
+28. How many applications have a loan_amount_000s greater than their applicant_income_000s?
+29. What is the average applicant_income_000s for applications with owner_occupancy code 1?
+30. For applications with action_taken code 3 (denied), what is the average loan_amount_000s?
+
+# --- Sampling Example (If needed) ---
+# 31. Show the application_id and loan_amount_000s for 10 sample applications with property_type code 1.

@@ -14,7 +14,7 @@ REMOTE_SCRIPT_PATH = "~/ilab_script.py" # Assumes ilab_script.py is in the home 
 
 # LLM Parameters (adjust as needed)
 N_CTX = 2048  # Context window size
-MAX_TOKENS = 50 # Max tokens to generate
+MAX_TOKENS = 150 # Max tokens to generate
 N_GPU_LAYERS = -1 # -1 means attempt to offload all layers to GPU (Metal on Mac)
 
 # --- Function to Load Schema ---
@@ -33,17 +33,17 @@ def load_schema(filepath):
 # --- Function to Create LLM Prompt ---
 def create_prompt(schema, question):
     """Creates the prompt for the LLM, encouraging SQL output."""
-    # Ending with the user question.
+    # Added explicit instruction to use exact names from schema
     prompt = f"""Given the following PostgreSQL database schema:
 
 ```sql
 {schema}
 ```
 
-Translate the following user question into a single, valid PostgreSQL SELECT query. Only output the SQL query.
+Translate the following user question into a single, valid PostgreSQL SELECT query. **Use only the exact table and column names provided in the schema.** Only output the SQL query.
 
 User Question: {question}
-""" # REMOVED "SQL Query:" from the end
+"""
     return prompt
 
 # --- Function to Extract SQL Query ---
@@ -52,7 +52,7 @@ def extract_sql(llm_output):
     # Basic regex: find text between "SQL:" and potential markdown/end of string
     # It looks for SELECT and assumes the query ends with a semicolon or the end of the string.
     # This might need significant refinement based on actual LLM output.
-    print(f"\nLLM Raw Output:\n{llm_output}", file=sys.stderr) # Debugging
+    print(f"\nLLM Raw Output Before Extraction Attempt:\n>>>\n{llm_output}\n<<<", file=sys.stderr) # Debugging - Show raw output
 
     # Try to find SQL block, possibly after "SQL:" or within ```sql ... ```
     # Pattern 1: Explicit SQL block
