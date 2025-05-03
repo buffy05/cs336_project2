@@ -3,12 +3,14 @@
 ## Team Members
 
 *   Saksham Mehta [sm2683]
-*   ...
+*   Soma Parvathini [svp98]
+*   Syona Bhandari [sb2199]
+*   Rhemie Patiak [rmp260]
 
-## Contributions
+## Contributions:  
+   - The project was collaborated on by Soma, Syona, Saksham, and Rhemie. We all participated in meetings to fix and debug code. We all worked on all aspects of the code equally.
 
-
-## How to Run
+## How to Run:
 
 1.  **Prerequisites:**
     *   Access to Rutgers ILAB machines (with PostgreSQL configured for your NetID)
@@ -24,13 +26,18 @@
     *   Enter your natural language questions about the database.
     *   Type `exit` to quit.
 
-## Challenges
+## What we found challenging:  
+   - **Parsing LLM output reliably**—the model sometimes wrapped the SQL in extra commentary, so our regex had to be very precise.  
+   - **Balancing prompt length vs. model context window**—too much schema caused truncation, too little led to wrong table names.  
+   - **Computing issues** - We were seeing slow runtimes at points of time with the ilab machines.
 
+## What we found interesting:  
+   - How small tweaks in the natural‐language prompt dramatically improved the correctness of generated SQL.  
+   - Watching the local GGUF model reliably generate complex joins and aggregates without any hand-coding.  
+   - Observing the performance trade-offs between model size and response latency.  
 
-## Interesting Findings
-
-## Extra Credit
-Yes we have implemented the extra credit requirement 
+Extra credit:  
+   - Yes, we implemented the extra credit requirement. We extended both `database_llm.py` and `ilab_script.py` to accept SQL via **stdin** when no command-line argument is provided.  
 
 
 ## LLM Chat Transcripts
