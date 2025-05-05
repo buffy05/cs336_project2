@@ -5,7 +5,6 @@ import re
 import paramiko
 from llama_cpp import Llama
 
-# --- Configuration ---
 # Model and connection details
 # Ensure MODEL_PATH points to your downloaded model file.
 MODEL_PATH = "Phi-3.5-mini-instruct-Q4_K_M.gguf"
@@ -18,7 +17,6 @@ N_CTX = 2048  # Model context window size
 MAX_TOKENS = 150 # Max tokens for LLM to generate
 N_GPU_LAYERS = -1 # Offload layers to GPU (-1 = try all)
 
-# --- Function to Load Schema ---
 def load_schema(filepath):
     """Loads the SQL schema from the specified file."""
     try:
@@ -31,7 +29,6 @@ def load_schema(filepath):
         print(f"Error reading schema file: {e}", file=sys.stderr)
         sys.exit(1)
 
-# --- Function to Create LLM Prompt ---
 def create_prompt(schema, question):
     """Builds the prompt for the LLM using the schema and user question."""
     # Instruct the LLM to use exact schema names and output only SQL.
@@ -47,7 +44,6 @@ User Question: {question}
 """
     return prompt
 
-# --- Function to Extract SQL Query ---
 def extract_sql(llm_output):
     """Extracts the first SQL SELECT query from the LLM's text output."""
     # print(f"\nLLM Raw Output Before Extraction Attempt:\n>>>\n{llm_output}\n<<<", file=sys.stderr) # Keep this debug line commented unless needed
@@ -81,7 +77,6 @@ def extract_sql(llm_output):
     return None
 
 
-# --- Function to Run Remote Script ---
 def run_remote_query(ssh_client, netid, sql_query, db_password):
     """Runs ilab_script.py remotely, passing query and password via stdin (Extra Credit method)."""
     # Extra Credit: Command now only includes netid
@@ -113,7 +108,6 @@ def run_remote_query(ssh_client, netid, sql_query, db_password):
         return None, str(e)
 
 
-# --- Main Function ---
 def main():
     schema = load_schema(SCHEMA_FILE)
 
