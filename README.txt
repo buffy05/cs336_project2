@@ -40,6 +40,6 @@ Extra credit:
    - Yes, we implemented the extra credit requirement. We extended both `database_llm.py` and `ilab_script.py` to accept SQL via **stdin** when no command-line argument is provided.  
 
 
-## LLM Chat Transcripts
+## AI Chat Transcripts
 
-*   [Link]
+*   https://docs.google.com/document/d/1CFAws1-_1A5uBCMQDq9KI8AD-hdm8NKftl7_4Xd8lzk/edit?usp=sharing
