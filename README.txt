@@ -43,3 +43,26 @@ Extra credit:
 ## AI Chat Transcripts
 
 *   https://docs.google.com/document/d/1CFAws1-_1A5uBCMQDq9KI8AD-hdm8NKftl7_4Xd8lzk/edit?usp=sharing
+
+## FrontEnd ExtraCredit: 
+Frontend Features
+The updated version of this project implements a fully functional and modern web-based frontend for querying a PostgreSQL database using natural language. The key frontend features include:
+
+- User Authentication Form: A clean and secure login interface for initializing SSH and database connections using NetID, SSH password, and database password.
+
+- Natural Language Query Input: After authentication, users can enter natural language questions about the database schema. These questions are translated into SQL queries by the LLM backend.
+
+- Dynamic Output Display: The output screen presents:
+
+   - The original question from the user,
+
+   - The generated SQL query,
+
+   - The raw LLM output.
+
+   - Interactive Table: Query results are rendered as a responsive HTML table that supports column sorting on click, offering a better data exploration experience.
+
+   - Modern UI Styling: Styled with a custom CSS (styles.css) for a clean, intuitive, and modern look, enhancing user interaction and readability.
+
+Responsive Feedback and Error Handling: User feedback is clearly communicated through dynamic success/error messages and loading states to guide user interaction.
+
