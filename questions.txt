@@ -1,4 +1,16 @@
 # Test Questions for Project 2 (HMDA 2017 NJ Database)
+
+
+#questionstoask
+1. How many records are in the Application table?
+
+
+2. What is the average value of loan_amount_000s?
+
+3. Calculate the sum of loan_amount_000s for all applications.
+
+4. What is the maximum loan_amount_000s recorded?
+
 # --- Basic Counts & Aggregations ---
 1.  How many records are in the Application table?
 2.  What is the average value of loan_amount_000s?

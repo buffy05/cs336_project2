@@ -1,0 +1,33 @@
+from flask import Flask, render_template, request, jsonify 
+
+app = Flask(__name__)
+
+def process_query(user_query):
+    if "select all customers" in user_query.lower():
+        sql_query = "SELECT * FROM customers;"
+        llm_output = "Select all customers."
+        results = [
+            {'name': 'Soma Parvathini', 'email': 'somaparvathini@gmail.com'},
+            {'name': 'Saksham Mehta', 'email': 'saksham@gmail.com'},
+            {'name': 'Syona Bhandari', 'email': 'syona@gmail.com'},
+            {'name': 'Rhemie Patiak', 'email': 'rhemie@gmail.com'}
+        ]
+    else:
+        sql_query = "SELECT * FROM data;"
+        llm_output = "Default query, unrecognized input."
+        results = [
+            {'name': 'John Smith', 'email': 'johnsmith@gmail.com'},
+            {'name': 'Soma 2', 'email': 'soma2@yahoo.com'}
+        ]
+    return sql_query, llm_output, results
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        user_query = request.form['query']
+        sql_query, llm_output, results = process_query(user_query)
+        return render_template('index.html', query=user_query, sql_query=sql_query, llm_output=llm_output, results=results)
+    return render_template('index.html', query=None, sql_query=None, llm_output=None, results=None)
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Query Interface</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Database Query Interface</h1>
+        
+        <div id="feedbackMessage" class="feedback-message" style="display: none;"></div>
+
+        <!-- Login Form -->
+        <div id="loginForm" class="form-container">
+            <h2>Initialize Connection</h2>
+            <form id="initForm">
+                <div class="form-group">
+                    <label for="netid">NetID:</label>
+                    <input type="text" id="netid" name="netid" required>
+                </div>
+                <div class="form-group">
+                    <label for="ssh_password">SSH Password:</label>
+                    <input type="password" id="ssh_password" name="ssh_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="db_password">Database Password:</label>
+                    <input type="password" id="db_password" name="db_password" required>
+                </div>
+                <button type="submit" id="initButton">Initialize</button>
+            </form>
+        </div>
+
+        <!-- Query Form (initially hidden) -->
+        <div id="queryForm" class="form-container" style="display: none;">
+            <h2>Ask a Question</h2>
+            <form id="questionForm">
+                <div class="form-group">
+                    <label for="question">Your Question:</label>
+                    <textarea id="question" name="question" rows="4" required 
+                              placeholder="Enter your question about the database..."></textarea>
+                </div>
+                <button type="submit" id="queryButton">Submit Query</button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="results-container" style="display: none;">
+            <h2>Results</h2>
+            <div class="query-info">
+                <h3>Original Question:</h3>
+                <pre id="originalQuestion"></pre> 
+                <h3>Generated SQL Query:</h3>
+                <pre id="sqlQuery"></pre>
+                <h3>LLM Output:</h3>
+                <pre id="llmOutput"></pre>
+            </div>
+            <div class="results-table">
+                <h3>Query Results:</h3>
+                <div id="resultsTableContainer"></div>
+            </div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Store credentials for reuse
+        let credentials = {
+            netid: '',
+            db_password: ''
+        };
+        
+        const initButton = document.getElementById('initButton');
+        const queryButton = document.getElementById('queryButton');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const resultsTableContainer = document.getElementById('resultsTableContainer');
+        let currentTableData = []; // To store the data for sorting
+        let sortDirections = {}; // To store sort direction for each column
+
+        function showFeedback(message, isError = false) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.className = isError ? 'feedback-message error' : 'feedback-message success';
+            feedbackMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            feedbackMessage.style.display = 'none';
+        }
+
+        function clearMessages() {
+            feedbackMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+        }
+
+        // Initialize connection
+        document.getElementById('initForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+            initButton.disabled = true;
+            initButton.textContent = 'Initializing...';
+            showFeedback('Initializing connection... Please wait.');
+
+            const netid = document.getElementById('netid').value;
+            const ssh_password = document.getElementById('ssh_password').value;
+            const db_password = document.getElementById('db_password').value;
+
+            try {
+                const response = await fetch('/initialize', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        netid,
+                        ssh_password,
+                        db_password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    credentials.netid = netid;
+                    credentials.db_password = db_password;
+                    
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('queryForm').style.display = 'block';
+                    document.getElementById('results').style.display = 'block';
+                    resultsTableContainer.innerHTML = '<p>Submit a query to see results.</p>';
+                    showFeedback('Initialization successful! You can now ask questions.', false);
+                } else {
+                    throw new Error(data.error || 'Initialization failed');
+                }
+            } catch (error) {
+                showError(`Initialization Error: ${error.message}`);
+                showFeedback('Initialization failed. Please check credentials and console.', true);
+            } finally {
+                initButton.disabled = false;
+                initButton.textContent = 'Initialize';
+            }
+        });
+
+        // Handle query submission
+        document.getElementById('questionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessages();
+            queryButton.disabled = true;
+            queryButton.textContent = 'Processing...';
+            showFeedback('Processing your query... This may take a moment.');
+
+            const questionText = document.getElementById('question').value;
+            document.getElementById('originalQuestion').textContent = questionText;
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: questionText,
+                        netid: credentials.netid,
+                        db_password: credentials.db_password
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('sqlQuery').textContent = data.sql_query;
+                    document.getElementById('llmOutput').textContent = data.llm_output;
+                    
+                    currentTableData = data.results || []; // Store data for sorting
+                    sortDirections = {}; // Reset sort directions
+                    renderTable(currentTableData);
+                    
+                    if (data.error) {
+                        showError(`Warning from backend: ${data.error}`);
+                    }
+                } else {
+                    throw new Error(data.error || 'Query processing failed');
+                }
+            } catch (error) {
+                showError(`Query Error: ${error.message}`);
+                resultsTableContainer.innerHTML = '';
+                showFeedback('An error occurred while processing your query.', true);
+            } finally {
+                queryButton.disabled = false;
+                queryButton.textContent = 'Submit Query';
+            }
+        });
+
+        function renderTable(dataToRender) {
+            if (dataToRender && dataToRender.length > 0) {
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
+                
+                Object.keys(dataToRender[0]).forEach((key, index) => {
+                    const th = document.createElement('th');
+                    th.textContent = key;
+                    th.style.cursor = 'pointer';
+                    th.addEventListener('click', () => sortTable(index, key));
+                    headerRow.appendChild(th);
+                });
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+                
+                const tbody = document.createElement('tbody');
+                dataToRender.forEach(row => {
+                    const tr = document.createElement('tr');
+                    Object.values(row).forEach(value => {
+                        const td = document.createElement('td');
+                        td.textContent = value;
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+                table.appendChild(tbody);
+                
+                resultsTableContainer.innerHTML = '';
+                resultsTableContainer.appendChild(table);
+                showFeedback('Query processed successfully.', false);
+            } else {
+                resultsTableContainer.innerHTML = '<p>No results found for your query.</p>';
+                showFeedback('Query processed, but no results were returned.', false);
+            }
+        }
+
+        function sortTable(columnIndex, columnKey) {
+            const currentDirection = sortDirections[columnKey] || 'asc';
+            const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            sortDirections[columnKey] = newDirection;
+
+            // Reset other column directions if desired, or allow multi-sort
+            // For simple single column sort, clear others:
+            Object.keys(sortDirections).forEach(key => {
+                if (key !== columnKey) sortDirections[key] = undefined;
+            });
+
+            currentTableData.sort((a, b) => {
+                let valA = Object.values(a)[columnIndex];
+                let valB = Object.values(b)[columnIndex];
+
+                // Attempt to convert to number for numerical sort, otherwise string sort
+                const numA = parseFloat(valA);
+                const numB = parseFloat(valB);
+
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    valA = numA;
+                    valB = numB;
+                }
+
+                if (valA < valB) return newDirection === 'asc' ? -1 : 1;
+                if (valA > valB) return newDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+            renderTable(currentTableData);
+        }
+
+    </script>
+</body>
+</html> 
